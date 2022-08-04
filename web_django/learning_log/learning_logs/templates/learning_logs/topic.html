@@ -1,0 +1,21 @@
+{% extends "learning_logs/base.html" %}
+
+{% block content %}
+
+    <p>Topics:{{ topic }}</p>
+    <p>Entries:</p>
+    <p>
+        <a href="{% url 'new_entry' topic.id %}">Add new entry</a>
+    </p>
+    <ul>
+        {% for entry in entries %}
+            <li>
+                <p>{{ entry.date_added|date:'Y M d, H:i' }}</p>
+                <p>{{ entry.text|linebreaks }}</p>
+            </li>
+        {% empty %}
+            <li>无</li>
+        {% endfor %}
+    </ul>
+
+{% endblock content %}

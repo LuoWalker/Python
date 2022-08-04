@@ -10,8 +10,10 @@ apps.name = 'learning_logs'
 识别到匹配的url，调用相应的view
 """
 urlpatterns = [
-    # 主页
-    path('', views.index, name='index'),
-    path('topics', views.topics, name='topics')
+    path('', views.index, name='index'),  # 主页
+    path('topics/', views.topics, name='topics'),  # 主题列表
+    path('topic/<int:topic_id>/', views.topic, name='topic'),  # 特定主题
+    path('new_topic/', views.new_topic, name='new_topic'),  # 新建主题
+    path('new_entry/<int:topic_id>/', views.new_entry, name='new_entry')
 
 ]
