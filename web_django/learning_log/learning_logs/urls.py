@@ -1,9 +1,8 @@
 """定义learning_logs的url模式"""
-from django import apps
-from django.urls import URLPattern, path
+from django.urls import URLPattern, path, include
 from . import views
 
-apps.name = 'learning_logs'
+app_name = 'learning_logs'
 
 """
 为每个试图定义url：path('url', 'view', '别名')
