@@ -14,6 +14,7 @@ urlpatterns = [
     path('topics/', views.topics, name='topics'),  # 主题列表
     path('topic/<int:topic_id>/', views.topic, name='topic'),  # 特定主题
     path('new_topic/', views.new_topic, name='new_topic'),  # 新建主题
-    path('new_entry/<int:topic_id>/', views.new_entry, name='new_entry')
+    path('new_entry/<int:topic_id>/', views.new_entry, name='new_entry'),  # 新建条目
+    path('edit_entry/<int:entry_id>', views.edit_entry, name='edit_entry'),  # 修改条目
 
 ]
