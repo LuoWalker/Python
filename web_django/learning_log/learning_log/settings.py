@@ -128,3 +128,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 我的设置
+LOGIN_URL = 'users:login'  # login_required 检查未登录，定向到login页面
