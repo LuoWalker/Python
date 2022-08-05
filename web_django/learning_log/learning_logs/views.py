@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
@@ -23,7 +23,7 @@ def topics(request):
 @login_required  # 检查用户登陆后，才继续运行下面代码
 def topic(request, topic_id):
     """显示特定主题"""
-    topic = Topic.objects.get(id=topic_id)
+    topic = get_object_or_404(Topic, id=topic_id)
     # 确认请求的主题属于当前用户
     if topic.owner != request.user:
         raise Http404
@@ -57,7 +57,7 @@ def new_entry(request, topic_id):
     topic = Topic.objects.get(id=topic_id)
     if topic.owner != request.user:
         raise Http404
-        
+
     if request.method != 'POST':
         # 未提交数据，创建新表单
         form = EntryForm()
