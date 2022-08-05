@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import django_heroku
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -133,3 +134,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # 我的设置
 LOGIN_URL = 'users:login'  # login_required 检查未登录，定向到login页面
+# Heroku设置
+django_heroku.settings(locals())
