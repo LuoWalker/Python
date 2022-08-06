@@ -3,6 +3,7 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 
 class AlienInvasion:
@@ -17,8 +18,10 @@ class AlienInvasion:
             (self.settings.screen_width, self.settings.screen_height))  # 创建主窗口的surface，经过一次循环后重画
         pygame.display.set_caption("打飞机")
         self.ship = Ship(self)
-
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+
+        self._create_fleet()
 
     def run_game(self):
         """开始游戏的主循环"""
@@ -65,11 +68,18 @@ class AlienInvasion:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+    def _create_fleet(self):
+        """创建外星人"""
+        # 创建一个
+        alien = Alien(self)
+        self.aliens.add(alien)
+
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)  # 使背景色填满
         self.ship.blitem()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.aliens.draw(self.screen)
         # 让最近绘制的屏幕可见
         pygame.display.flip()  # 每次循环重画，只保留最新的
 
