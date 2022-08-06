@@ -30,6 +30,7 @@ class AlienInvasion:
             self._check_events()
             self.ship.update()
             self._update_bullets()
+            self._update_aliens()
             self._update_screen()
 
     def _check_events(self):  # 方法中的方法，辅助方法
@@ -63,16 +64,71 @@ class AlienInvasion:
             self.bullets.add(new_bullet)
 
     def _update_bullets(self):
+        # 更新位置
         self.bullets.update()
+        # 删除消失的子弹
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
+        self._check_bullet_alien_collisions()
+
+    def _create_alien(self, alien_number, margin, row_number):
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+        alien.x = margin + 2 * alien_width * alien_number
+        alien.rect.x = alien.x
+        alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
+        self.aliens.add(alien)
+
+    def _update_aliens(self):
+        """更新外星人位置"""
+        self._check_fleet_edges()
+        self.aliens.update()
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            print("ship hit")
 
     def _create_fleet(self):
         """创建外星人"""
-        # 创建一个
+        # 横向判断距离
         alien = Alien(self)
-        self.aliens.add(alien)
+        alien_width, alien_heigh = alien.rect.size
+        available_space_x = self.settings.screen_width - (2 * alien_width)
+        number_aliens_x = 10  # available_space_x // (2 * alien_width)
+        # 计算横边距
+        margin = (self.settings.screen_width -
+                  (2 * number_aliens_x - 1) * alien_width) / 2
+
+        # 纵向距离
+        ship_height = self.ship.rect.height
+        available_space_y = self.settings.screen_height - \
+            (3 * alien_heigh) - ship_height
+        number_rows = available_space_y // (2 * alien_heigh)
+
+        # 创建外星人群
+        for row_number in range(number_rows):
+            for alien_number in range(number_aliens_x):
+                self._create_alien(alien_number, margin, row_number)
+
+    def _check_fleet_edges(self):
+        """外星人到边"""
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """下移 变向"""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
+
+    def _check_bullet_alien_collisions(self):
+        """判断碰撞 collisions={bullet: alien}, True: 确认删除"""
+        collisions = pygame.sprite.groupcollide(
+            self.bullets, self.aliens, True, True)
+        if not self.aliens:
+            self.bullets.empty()
+            self._create_fleet()
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)  # 使背景色填满
