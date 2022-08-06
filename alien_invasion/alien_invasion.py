@@ -1,6 +1,8 @@
 import sys
+from time import sleep
 import pygame
 from settings import Settings
+from game_stats import GameStats
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -17,10 +19,12 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height))  # 创建主窗口的surface，经过一次循环后重画
         pygame.display.set_caption("打飞机")
+
         self.ship = Ship(self)
+        self.stats = GameStats(self)
+
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
-
         self._create_fleet()
 
     def run_game(self):
@@ -85,7 +89,7 @@ class AlienInvasion:
         self._check_fleet_edges()
         self.aliens.update()
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
-            print("ship hit")
+            self._ship_hit()
 
     def _create_fleet(self):
         """创建外星人"""
@@ -129,6 +133,19 @@ class AlienInvasion:
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+
+    def _ship_hit(self):
+        """飞机撞"""
+
+        self.stats.ships_left -= 1
+
+        self.aliens.empty()
+        self.bullets.empty()
+
+        self._create_fleet()
+        self.ship.center_ship()
+
+        sleep(0.5)
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)  # 使背景色填满
