@@ -32,9 +32,10 @@ class AlienInvasion:
         while True:
             # 获取键鼠
             self._check_events()
-            self.ship.update()
-            self._update_bullets()
-            self._update_aliens()
+            if self.stats.game_active:
+                self.ship.update()
+                self._update_bullets()
+                self._update_aliens()
             self._update_screen()
 
     def _check_events(self):  # 方法中的方法，辅助方法
@@ -90,6 +91,7 @@ class AlienInvasion:
         self.aliens.update()
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             self._ship_hit()
+        self._check_aliens_bottom()
 
     def _create_fleet(self):
         """创建外星人"""
@@ -136,16 +138,26 @@ class AlienInvasion:
 
     def _ship_hit(self):
         """飞机撞"""
+        if self.stats.ships_left > 0:
+            self.stats.ships_left -= 1
 
-        self.stats.ships_left -= 1
+            self.aliens.empty()
+            self.bullets.empty()
 
-        self.aliens.empty()
-        self.bullets.empty()
+            self._create_fleet()
+            self.ship.center_ship()
 
-        self._create_fleet()
-        self.ship.center_ship()
+            sleep(0.5)
+        else:
+            self.stats.game_active = False
 
-        sleep(0.5)
+    def _check_aliens_bottom(self):
+        """外星人到底"""
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= screen_rect.bottom:
+                self._ship_hit()
+                break
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)  # 使背景色填满
