@@ -5,7 +5,7 @@
 彩云API：
 Token：sw2LVIjbsU08prHl
 实时天气数据 API:  https://api.caiyunapp.com/v2.5/{Token}/{经度, 纬度}/realtime.json
-示范 URL:  https://api.caiyunapp.com/v2.5/sw2LVIjbsU08prHl/121.6544,25.1552/realtime.json
+示范 URL:  https://api.caiyunapp.com/v2.6/sw2LVIjbsU08prHl/121.6544,25.1552/realtime.json
 天气现象：https://docs.caiyunapp.com/docs/tables/skycon
 """
 import json
@@ -47,10 +47,11 @@ skycon_chart = {'晴（白天）': 'CLEAR_DAY',
 # 实时天气数据
 token = 'sw2LVIjbsU08prHl'
 location = ','.join(sys.argv[1:])
-caiyun_url = 'https://api.caiyunapp.com/v2.5/%s/%s/realtime.json' % (
+hours = 2
+caiyun_realtime_url = 'https://api.caiyunapp.com/v2.6/%s/%s/realtime.json' % (
     token, location)
 
-res = requests.get(caiyun_url)
+res = requests.get(caiyun_realtime_url)
 res.raise_for_status()
 
 weather_data = json.loads(res.text)
@@ -60,9 +61,31 @@ weather_realtime = weather_data['result']['realtime']
 weather_realtime['skycon'] = get_key(weather_realtime['skycon'])
 weather_print = {'天气': weather_realtime['skycon'], '温度': weather_realtime['temperature'],
                  '体感温度': weather_realtime['apparent_temperature'], '相对湿度': weather_realtime['humidity'], }
-
+print("当前温度：")
 for k, v in weather_print.items():
     print(f'{k.rjust(4,"　")}:{v}')
-
 print('---')
-print('数据来自彩云天气')
+
+# 小时级预报
+caiyun_hourly_url = 'https://api.caiyunapp.com/v2.6/%s/%s//hourly?hourlysteps=%d' % (
+    token, location, hours)
+
+res = requests.get(caiyun_hourly_url)
+res.raise_for_status()
+
+weather_data = json.loads(res.text)
+weather_hourly = weather_data['result']['hourly']
+
+# pprint.pprint(weather_hourly)
+print("预告：")
+print(weather_hourly['description'])
+for hour in range(hours):
+    print(f'{hour}小时后：')
+    weather_hourly['skycon'][hour]['value'] = get_key(
+        weather_hourly['skycon'][hour]['value'])
+    weather_print[hour] = {'天气': weather_hourly['skycon'][hour]['value'], '温度': weather_hourly['temperature'][hour]['value'],
+                           '体感温度': weather_hourly['apparent_temperature'][hour]['value'], '相对湿度': weather_hourly['humidity'][hour]['value'], }
+
+    for k, v in weather_print[hour].items():
+        print(f'{k.rjust(4,"　")}:{v}')
+    print('---')
