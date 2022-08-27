@@ -7,12 +7,16 @@ Token：sw2LVIjbsU08prHl
 实时天气数据 API:  https://api.caiyunapp.com/v2.5/{Token}/{经度, 纬度}/realtime.json
 示范 URL:  https://api.caiyunapp.com/v2.6/sw2LVIjbsU08prHl/121.6544,25.1552/realtime.json
 天气现象：https://docs.caiyunapp.com/docs/tables/skycon
+
+高德API：
+Key：ff067f6a598c9dfcdc34c21352713e1c
+示范url：https://restapi.amap.com/v3/geocode/geo?key=ff067f6a598c9dfcdc34c21352713e1c&address=北鲁坡村
 """
+
 import json
 import requests
 import sys
 import pprint
-import bs4
 
 
 def get_key(val):
@@ -46,7 +50,16 @@ skycon_chart = {'晴（白天）': 'CLEAR_DAY',
 
 # 实时天气数据
 token = 'sw2LVIjbsU08prHl'
-location = ','.join(sys.argv[1:])
+key = 'ff067f6a598c9dfcdc34c21352713e1c'
+locations = ''.join(sys.argv[1:])
+gaode_lon_lat_url = 'https://restapi.amap.com/v3/geocode/geo?key=%s&address=%s' % (
+    key, locations)
+res = requests.get(gaode_lon_lat_url)
+res.raise_for_status()
+locations_data = json.loads(res.text)
+# pprint.pprint(locations_data)
+location = locations_data['geocodes'][0]['location']
+print("您的位置是："+locations_data['geocodes'][0]['formatted_address'])
 hours = 2
 caiyun_realtime_url = 'https://api.caiyunapp.com/v2.6/%s/%s/realtime.json' % (
     token, location)
